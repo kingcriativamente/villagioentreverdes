@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Villagio Entre Verdes</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        terracotta: {
+                            DEFAULT: '#A64322',
+                            dark: '#8A361A'
+                        },
+                        sand: '#F9F6F0',
+                        forest: '#2C4C3B'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9F6F0; /* sand */
+            color: #1f2937;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Cormorant Garamond', serif;
+        }
+        ::selection {
+            background-color: #A64322;
+            color: white;
+        }
+
+        /* Navbar Scroll States */
+        nav { transition: all 0.3s ease; }
+        nav[data-scrolled="true"] { background-color: white; padding-top: 1rem; padding-bottom: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        nav[data-scrolled="false"] { background-color: transparent; padding-top: 1.5rem; padding-bottom: 1.5rem; }
+        
+        nav[data-scrolled="true"] .nav-text { color: #1f2937; }
+        nav[data-scrolled="true"] .logo-title { color: #2C4C3B; }
+        nav[data-scrolled="true"] .logo-sub { color: rgba(44, 76, 59, 0.7); }
+        
+        nav[data-scrolled="false"] .nav-text { color: white; }
+        nav[data-scrolled="false"] .logo-title { color: white; }
+        nav[data-scrolled="false"] .logo-sub { color: rgba(255, 255, 255, 0.8); }
+
+        /* Scroll Animations (Fade Up) */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+
+        /* Marquee Gallery Animation */
+        .marquee-container {
+            overflow: hidden;
+            width: 100%;
+            position: relative;
+            cursor: grab;
+        }
+        .marquee-container:active { cursor: grabbing; }
+        .marquee-content {
+            display: flex;
+            width: max-content;
+            animation: marquee 40s linear infinite;
+        }
+        .marquee-container:hover .marquee-content {
+            animation-play-state: paused;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Modal Transitions */
+        #image-modal { transition: opacity 0.3s ease; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navbar -->
+    <nav id="navbar" data-scrolled="false" class="fixed w-full z-50 top-0 left-0">
+        <div class="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" class="flex flex-col">
+                <span class="logo-title font-serif text-2xl md:text-3xl font-semibold tracking-wide transition-colors duration-300">
+                    VILLAGIO
+                </span>
+                <span class="logo-sub text-[0.65rem] md:text-xs font-sans tracking-[0.2em] font-light transition-colors duration-300">
+                    ENTRE VERDES
+                </span>
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#concept" class="nav-text font-medium text-sm hover:text-terracotta transition-colors duration-300">Conceito</a>
+                <a href="#about" class="nav-text font-medium text-sm hover:text-terracotta transition-colors duration-300">O Empreendimento</a>
+                <a href="#differentials" class="nav-text font-medium text-sm hover:text-terracotta transition-colors duration-300">Diferenciais</a>
+                <a href="#gallery" class="nav-text font-medium text-sm hover:text-terracotta transition-colors duration-300">Galeria</a>
+                <a href="#location" class="nav-text font-medium text-sm hover:text-terracotta transition-colors duration-300">Localização</a>
+                <a href="#contact" class="bg-terracotta hover:bg-terracotta-dark text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all hover:shadow-lg">
+                    Fale Conosco
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="md:hidden nav-text focus:outline-none">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex-col space-y-4 border-t border-gray-100">
+            <a href="#concept" class="text-gray-800 font-medium mobile-link">Conceito</a>
+            <a href="#about" class="text-gray-800 font-medium mobile-link">O Empreendimento</a>
+            <a href="#differentials" class="text-gray-800 font-medium mobile-link">Diferenciais</a>
+            <a href="#gallery" class="text-gray-800 font-medium mobile-link">Galeria</a>
+            <a href="#location" class="text-gray-800 font-medium mobile-link">Localização</a>
+            <a href="#contact" class="bg-terracotta text-white px-6 py-3 rounded-full text-center font-medium mobile-link">
+                Fale Conosco
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80" alt="Villagio Entre Verdes" class="w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70"></div>
+        </div>
+
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto mt-20 fade-up">
+            <h1 class="text-5xl md:text-7xl lg:text-8xl text-white font-light mb-6 leading-tight">
+                Villagio Entre Verdes
+            </h1>
+            <p class="text-xl md:text-2xl text-white/90 font-light mb-8 max-w-2xl mx-auto delay-100">
+                A natureza como extensão da sua casa
+            </p>
+            <div class="delay-200">
+                <a href="#contact" class="inline-block bg-terracotta hover:bg-terracotta-dark text-white px-8 py-4 rounded-full text-lg font-medium transition-all hover:scale-105 shadow-lg mt-8">
+                    Fale com um corretor
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Concept Section -->
+    <section id="concept" class="py-24 md:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div class="order-2 md:order-1 fade-up">
+                    <h2 class="text-4xl md:text-5xl text-forest mb-6">Conceito do Empreendimento</h2>
+                    <div class="w-20 h-1 bg-terracotta mb-8"></div>
+                    <p class="text-lg text-gray-600 leading-relaxed font-light">
+                        O Villagio Entre Verdes é um condomínio de casas planejado para quem busca tranquilidade, segurança e qualidade de vida. Cercado pela natureza e pensado para proporcionar mais espaço, conforto e bem-estar, o empreendimento oferece um ambiente ideal para viver com mais calma e qualidade.
+                    </p>
+                </div>
+                <div class="order-1 md:order-2 relative h-[500px] rounded-2xl overflow-hidden shadow-2xl fade-up delay-100">
+                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Conceito do Empreendimento" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 md:py-32 bg-sand">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="relative h-[600px] rounded-2xl overflow-hidden shadow-2xl group cursor-pointer fade-up enlargeable-image-container">
+                    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="O Empreendimento" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 enlargeable-image" />
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                        <div class="bg-white/90 text-forest px-6 py-3 rounded-full flex items-center backdrop-blur-sm">
+                            <i data-lucide="zoom-in" class="w-5 h-5 mr-2"></i> Ampliar imagem
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="fade-up delay-100">
+                    <h2 class="text-4xl md:text-5xl text-forest mb-6">O Empreendimento</h2>
+                    <div class="w-20 h-1 bg-terracotta mb-8"></div>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed font-light">
+                        Projetado por arquitetos renomados, o Villagio Entre Verdes harmoniza a arquitetura contemporânea com a paisagem natural. Cada detalhe foi pensado para maximizar a iluminação natural, a ventilação cruzada e a integração entre os ambientes internos e externos.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed font-light">
+                        Com lotes amplos e infraestrutura subterrânea, garantimos uma estética limpa e desimpedida, onde o verde é o verdadeiro protagonista da sua janela.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-8 mt-12">
+                        <div>
+                            <div class="text-4xl font-serif text-terracotta mb-2">120</div>
+                            <div class="text-sm uppercase tracking-wider text-gray-500 font-medium">Lotes Exclusivos</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-serif text-terracotta mb-2">50k</div>
+                            <div class="text-sm uppercase tracking-wider text-gray-500 font-medium">m² de Área Verde</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-serif text-terracotta mb-2">100%</div>
+                            <div class="text-sm uppercase tracking-wider text-gray-500 font-medium">Fiação Subterrânea</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-serif text-terracotta mb-2">24h</div>
+                            <div class="text-sm uppercase tracking-wider text-gray-500 font-medium">Segurança Armada</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lifestyle Section -->
+    <section class="relative py-32 md:py-48 flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="Viver entre o verde" class="w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-black/50"></div>
+        </div>
+        <div class="relative z-10 text-center px-6 max-w-3xl mx-auto fade-up">
+            <h2 class="text-4xl md:text-6xl text-white font-light mb-6">Viver Entre o Verde</h2>
+            <p class="text-xl text-white/90 font-light leading-relaxed">
+                Acordar com o canto dos pássaros, respirar ar puro e ter a tranquilidade de um refúgio particular, sem abrir mão da conveniência da vida moderna.
+            </p>
+        </div>
+    </section>
+
+    <!-- Differentials Section -->
+    <section id="differentials" class="py-24 md:py-32 bg-terracotta text-white">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="text-center max-w-3xl mx-auto mb-20 fade-up">
+                <h2 class="text-4xl md:text-5xl mb-6">Diferenciais Exclusivos</h2>
+                <div class="w-20 h-1 bg-white/30 mx-auto mb-8"></div>
+                <p class="text-lg text-white/80 font-light">
+                    Infraestrutura completa e pensada para proporcionar a melhor experiência de moradia para você e sua família.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-10 rounded-2xl hover:-translate-y-2 hover:bg-white/15 transition-all duration-300 fade-up">
+                    <div class="w-14 h-14 bg-white text-terracotta rounded-full flex items-center justify-center mb-6 shadow-lg">
+                        <i data-lucide="shield" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-medium mb-4">Segurança Premium</h3>
+                    <p class="text-white/70 font-light leading-relaxed">
+                        Portaria blindada 24h, controle de acesso biométrico, ronda motorizada e monitoramento por câmeras em todo o perímetro.
+                    </p>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-10 rounded-2xl hover:-translate-y-2 hover:bg-white/15 transition-all duration-300 fade-up delay-100">
+                    <div class="w-14 h-14 bg-white text-terracotta rounded-full flex items-center justify-center mb-6 shadow-lg">
+                        <i data-lucide="leaf" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-medium mb-4">Sustentabilidade</h3>
+                    <p class="text-white/70 font-light leading-relaxed">
+                        Reuso de águas pluviais para irrigação, iluminação em LED nas vias, energia solar nas áreas comuns e coleta seletiva.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-10 rounded-2xl hover:-translate-y-2 hover:bg-white/15 transition-all duration-300 fade-up delay-200">
+                    <div class="w-14 h-14 bg-white text-terracotta rounded-full flex items-center justify-center mb-6 shadow-lg">
+                        <i data-lucide="wifi" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-medium mb-4">Tecnologia</h3>
+                    <p class="text-white/70 font-light leading-relaxed">
+                        Infraestrutura de fibra óptica subterrânea entregue em todos os lotes, garantindo internet de ultra velocidade e estética visual limpa.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Areas Section -->
+    <section id="areas" class="py-24 md:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="text-center max-w-3xl mx-auto mb-20 fade-up">
+                <h2 class="text-4xl md:text-5xl text-forest mb-6">Áreas do Empreendimento</h2>
+                <div class="w-20 h-1 bg-terracotta mx-auto mb-8"></div>
+                <p class="text-lg text-gray-600 font-light">
+                    Espaços projetados para o seu lazer, bem-estar e convívio social.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Area 1 -->
+                <div class="group relative h-[400px] rounded-2xl overflow-hidden fade-up">
+                    <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Praça de Entrada" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-8 w-full">
+                        <h3 class="text-2xl text-white font-serif mb-2">Praça de Entrada</h3>
+                        <p class="text-white/80 font-light transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                            Um imponente espelho d'água e paisagismo exuberante para receber você todos os dias.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Area 2 -->
+                <div class="group relative h-[400px] rounded-2xl overflow-hidden fade-up delay-100">
+                    <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Clube Exclusivo" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-8 w-full">
+                        <h3 class="text-2xl text-white font-serif mb-2">Clube Exclusivo</h3>
+                        <p class="text-white/80 font-light transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                            Piscina com borda infinita, academia equipada e salão de festas sofisticado.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Area 3 -->
+                <div class="group relative h-[400px] rounded-2xl overflow-hidden fade-up">
+                    <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Áreas Verdes" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-8 w-full">
+                        <h3 class="text-2xl text-white font-serif mb-2">Trilhas e Áreas Verdes</h3>
+                        <p class="text-white/80 font-light transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                            Mais de 2km de trilhas para caminhada em meio a um bosque preservado.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Area 4 -->
+                <div class="group relative h-[400px] rounded-2xl overflow-hidden fade-up delay-100">
+                    <img src="https://images.unsplash.com/photo-1571055107559-3e67626fa8be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Espaços de Convivência" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-8 w-full">
+                        <h3 class="text-2xl text-white font-serif mb-2">Espaços de Convivência</h3>
+                        <p class="text-white/80 font-light transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                            Fogo de chão, redário e espaços gourmet espalhados pelo condomínio.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section (Marquee) -->
+    <section id="gallery" class="py-24 md:py-32 bg-terracotta overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 md:px-12 mb-16 fade-up">
+            <div class="flex flex-col md:flex-row md:items-end justify-between">
+                <div>
+                    <h2 class="text-4xl md:text-5xl text-white mb-6">Galeria</h2>
+                    <div class="w-20 h-1 bg-white/30 mb-6 md:mb-0"></div>
+                </div>
+                <p class="text-white/80 font-light max-w-md">
+                    Explore os detalhes que fazem do Villagio Entre Verdes um lugar único. Deslize para ver mais.
+                </p>
+            </div>
+        </div>
+
+        <!-- Marquee Container -->
+        <div class="marquee-container fade-up delay-100">
+            <!-- Content duplicated for seamless loop -->
+            <div class="marquee-content">
+                <!-- Set 1 -->
+                <div class="flex gap-6 px-3">
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 1">
+                    </div>
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 2">
+                    </div>
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 3">
+                    </div>
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 4">
+                    </div>
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 5">
+                    </div>
+                </div>
+                <!-- Set 2 (Duplicate) -->
+                <div class="flex gap-6 px-3">
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 1">
+                    </div>
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 2">
+                    </div>
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 3">
+                    </div>
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 4">
+                    </div>
+                    <div class="w-[300px] md:w-[450px] h-[400px] md:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" alt="Galeria 5">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Overlay Arrows (visible on hover) -->
+            <div class="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-terracotta to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-start pl-4 pointer-events-none hidden md:flex">
+                <i data-lucide="chevron-left" class="text-white w-10 h-10"></i>
+            </div>
+            <div class="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-terracotta to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-end pr-4 pointer-events-none hidden md:flex">
+                <i data-lucide="chevron-right" class="text-white w-10 h-10"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section id="location" class="py-24 md:py-32 bg-sand">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="fade-up">
+                    <h2 class="text-4xl md:text-5xl text-forest mb-6">Localização Privilegiada</h2>
+                    <div class="w-20 h-1 bg-terracotta mb-8"></div>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed font-light">
+                        Estrategicamente localizado para oferecer o silêncio da natureza sem abrir mão da conveniência urbana. A poucos minutos dos principais centros comerciais, escolas de excelência e vias de acesso rápido.
+                    </p>
+                    
+                    <ul class="space-y-6 mb-8">
+                        <li class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-terracotta shadow-sm mr-4 shrink-0">
+                                <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-forest mb-1">Endereço</h4>
+                                <p class="text-gray-500 font-light">Rua Amabile Paviotti Pedrone, Gleba 9E, nº 120, Sumaré – SP</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-terracotta shadow-sm mr-4 shrink-0">
+                                <i data-lucide="car" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-forest mb-1">Acessos</h4>
+                                <p class="text-gray-500 font-light">5 min da Rodovia Anhanguera<br/>15 min do Centro de Campinas</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-terracotta shadow-sm mr-4 shrink-0">
+                                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-forest mb-1">Conveniência</h4>
+                                <p class="text-gray-500 font-light">Próximo a shoppings, supermercados premium e escolas internacionais.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="h-[500px] bg-gray-200 rounded-2xl overflow-hidden shadow-xl relative fade-up delay-100">
+                    <!-- Map Placeholder Image -->
+                    <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Mapa da Região" class="w-full h-full object-cover grayscale opacity-80" />
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="bg-white/90 backdrop-blur-sm px-6 py-4 rounded-xl shadow-lg text-center border border-gray-100">
+                            <i data-lucide="map-pin" class="w-8 h-8 text-terracotta mx-auto mb-2"></i>
+                            <p class="font-medium text-forest">Villagio Entre Verdes</p>
+                            <p class="text-sm text-gray-500 mt-1">Ver no Google Maps</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 md:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div class="fade-up">
+                    <h2 class="text-4xl md:text-5xl text-forest mb-6">Agende sua Visita</h2>
+                    <div class="w-20 h-1 bg-terracotta mb-8"></div>
+                    <p class="text-lg text-gray-600 mb-10 leading-relaxed font-light">
+                        Preencha o formulário abaixo e um de nossos consultores especializados entrará em contato para apresentar todos os detalhes deste projeto exclusivo.
+                    </p>
+                    
+                    <form class="space-y-6" onsubmit="event.preventDefault();">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                                <input type="text" id="name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-terracotta focus:border-transparent outline-none transition-all bg-sand/50" placeholder="Seu nome" />
+                            </div>
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Telefone / WhatsApp</label>
+                                <input type="tel" id="phone" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-terracotta focus:border-transparent outline-none transition-all bg-sand/50" placeholder="(00) 00000-0000" />
+                            </div>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                            <input type="email" id="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-terracotta focus:border-transparent outline-none transition-all bg-sand/50" placeholder="seu@email.com" />
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Mensagem (Opcional)</label>
+                            <textarea id="message" rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-terracotta focus:border-transparent outline-none transition-all bg-sand/50 resize-none" placeholder="Como podemos ajudar?"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-terracotta hover:bg-terracotta-dark text-white font-medium py-4 rounded-lg transition-colors shadow-md text-lg">
+                            Enviar Mensagem
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="relative h-full min-h-[400px] rounded-2xl overflow-hidden shadow-2xl fade-up delay-100">
+                    <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Atendimento" class="absolute inset-0 w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-forest/80 mix-blend-multiply"></div>
+                    <div class="absolute inset-0 flex flex-col justify-center p-12 text-white">
+                        <h3 class="text-3xl font-serif mb-8">Plantão de Vendas</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mr-4 backdrop-blur-sm">
+                                    <i data-lucide="phone" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-white/70 uppercase tracking-wider mb-1">Telefone</p>
+                                    <p class="text-xl font-light">(11) 99999-9999</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mr-4 backdrop-blur-sm">
+                                    <i data-lucide="mail" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-white/70 uppercase tracking-wider mb-1">E-mail</p>
+                                    <p class="text-xl font-light">contato@villagio.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mr-4 backdrop-blur-sm">
+                                    <i data-lucide="clock" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-white/70 uppercase tracking-wider mb-1">Horário de Atendimento</p>
+                                    <p class="text-xl font-light">Todos os dias, das 9h às 18h</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-terracotta text-white/90 py-16">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="font-serif text-2xl font-semibold tracking-wide text-white mb-6">
+                        VILLAGIO<br/><span class="text-sm font-sans tracking-[0.2em] font-light text-white/80">ENTRE VERDES</span>
+                    </div>
+                    <p class="font-light max-w-sm mb-6">
+                        Um refúgio sofisticado que combina conforto, natureza e exclusividade para quem busca o melhor da vida.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-terracotta transition-colors">
+                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-terracotta transition-colors">
+                            <i data-lucide="facebook" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-medium mb-6 uppercase tracking-wider text-sm">Desenvolvimento</h4>
+                    <p class="font-light mb-2">Construtora Premium S.A.</p>
+                    <p class="font-light mb-2">CRECI: 12345-J</p>
+                    <p class="font-light text-sm mt-4 text-white/60">
+                        Imagens meramente ilustrativas. O projeto encontra-se em fase de aprovação.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-medium mb-6 uppercase tracking-wider text-sm">Contato</h4>
+                    <p class="font-light mb-2 flex items-center"><i data-lucide="phone" class="w-4 h-4 mr-2"></i> (11) 99999-9999</p>
+                    <p class="font-light mb-2 flex items-center"><i data-lucide="mail" class="w-4 h-4 mr-2"></i> contato@villagio.com</p>
+                    <p class="font-light flex items-start mt-4"><i data-lucide="map-pin" class="w-4 h-4 mr-2 mt-1 shrink-0"></i> Plantão de Vendas:<br/>Rua Amabile Paviotti Pedrone, 120</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center text-sm font-light">
+                <p>&copy; <span id="current-year"></span> Villagio Entre Verdes. Todos os direitos reservados.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors">Política de Privacidade</a>
+                    <a href="#" class="hover:text-white transition-colors">Termos de Uso</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Image Modal (Lightbox) -->
+    <div id="image-modal" class="fixed inset-0 z-[100] bg-black/90 hidden opacity-0 items-center justify-center p-4 backdrop-blur-sm">
+        <button id="close-modal" class="absolute top-6 right-6 text-white/70 hover:text-white bg-black/50 hover:bg-black/80 rounded-full p-2 transition-all">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+        <img id="modal-image" src="" alt="Imagem Ampliada" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" />
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Set Current Year in Footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.setAttribute('data-scrolled', 'true');
+            } else {
+                navbar.setAttribute('data-scrolled', 'false');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('flex');
+        });
+
+        // Close mobile menu when clicking a link
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('flex');
+            });
+        });
+
+        // Intersection Observer for Scroll Animations (Fade Up)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -50px 0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-up').forEach(element => {
+            observer.observe(element);
+        });
+
+        // Image Modal Logic
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-image');
+        const closeBtn = document.getElementById('close-modal');
+        const enlargeableImages = document.querySelectorAll('.enlargeable-image');
+
+        function openModal(src) {
+            modalImg.src = src;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Small delay to allow display:flex to apply before changing opacity for transition
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeModal() {
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                modalImg.src = '';
+            }, 300); // Match transition duration
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        enlargeableImages.forEach(img => {
+            // Add click event to the container to make it easier to click
+            const container = img.closest('.enlargeable-image-container');
+            if(container) {
+                container.addEventListener('click', () => openModal(img.src));
+            } else {
+                img.addEventListener('click', () => openModal(img.src));
+            }
+        });
+
+        closeBtn.addEventListener('click', closeModal);
+
+        // Close modal when clicking outside the image
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
